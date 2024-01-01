@@ -2,7 +2,7 @@
   "name": "trello-code-review",
   "displayName": "Trello Code Review",
   "description": "Efficiently create code review feedback on trello",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "HaoLi",
   "author": {
     "name": "HaoLi",
@@ -15,16 +15,22 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kiroInn/vscode-trello-code-review"
+  },
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "trello-code-review.authenticate",
+        "category": "Trello Code Review",
         "title": "Authenticate"
       },
       {
         "command": "trello-code-review.addCard",
+        "category": "Trello Code Review",
         "title": "AddCard"
       }
     ]
