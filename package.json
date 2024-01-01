@@ -1,8 +1,14 @@
 {
   "name": "trello-code-review",
-  "displayName": "trello-code-review",
+  "displayName": "Trello Code Review",
   "description": "Efficiently create code review feedback on trello",
   "version": "0.0.1",
+  "publisher": "HaoLi",
+  "author": {
+    "name": "HaoLi",
+    "url": "https://github.com/kiroInn",
+    "email": "kiroinn@gmail.com"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
