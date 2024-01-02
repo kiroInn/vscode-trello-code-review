@@ -7,4 +7,4 @@ export const GLOBAL_STATE: GlobalStateConfig = {
   API_TOKEN: 'trello_code_review_api_token',
 };
 
-export const ENCRYPTION_KEY = 'i@jdn*&&#%!@#(9oj!@#!@#p09';
+export const ENCRYPTION_KEY = 'i@jdn*&&#%!@#(9oj!@#!@#p09*#DJ00';
