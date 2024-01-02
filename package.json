@@ -1,5 +1,5 @@
 {
-  "name": "trello-code-review",
+  "name": "vscode-trello-code-review",
   "displayName": "Trello Code Review",
   "description": "Efficiently create code review feedback on trello",
   "version": "0.0.2",
