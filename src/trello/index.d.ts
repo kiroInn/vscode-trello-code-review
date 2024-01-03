@@ -68,5 +68,6 @@ export interface CheckItem {
 export interface GlobalStateConfig {
   API_KEY: string;
   API_TOKEN: string;
+  BOARD_ID: string;
   [key: string]: string;
 }

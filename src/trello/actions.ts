@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import axios from 'axios';
 
 import { encrypt, decrypt, getCurrentDate } from '../common/utils';
-import { TrelloBoard, TrelloList} from '.';
+import { TrelloBoard, TrelloList } from '.';
 import { API_BASE_URL, GLOBAL_STATE } from './constants';
 import { trelloApiGetRequest, trelloApiPostRequest } from './api';
 
@@ -10,6 +10,7 @@ export class TrelloActions {
   private globalState: any;
   private API_KEY: string | undefined;
   private API_TOKEN: string | undefined;
+  private BOARD_ID: string | undefined;
 
   constructor(context?: vscode.ExtensionContext) {
     this.globalState = context ? context.globalState : {};
@@ -22,6 +23,7 @@ export class TrelloActions {
     try {
       this.API_KEY = this.globalState.get(GLOBAL_STATE.API_KEY);
       this.API_TOKEN = decrypt(this.globalState.get(GLOBAL_STATE.API_TOKEN));
+      this.BOARD_ID = this.globalState.get(GLOBAL_STATE.BOARD_ID);
     } catch (error) {
       console.error(error);
       vscode.window.showErrorMessage('Error getting credentials');
@@ -93,6 +95,7 @@ export class TrelloActions {
         this.globalState.update(GLOBAL_STATE.API_KEY, apiKey);
         await this.fetchApiToken(apiKey);
         this.getCredentials();
+        await this.updateBoardId();
       } else {
         const appKeyUrl = await vscode.window.showInformationMessage(
           'Get your Trello API key here:',
@@ -108,6 +111,39 @@ export class TrelloActions {
     } catch (error) {
       console.error(error);
       vscode.window.showErrorMessage('Error during authentication');
+    }
+  }
+  async updateBoardId(): Promise<void> {
+    try {
+      const url = await vscode.window.showInputBox({
+        ignoreFocusOut: true,
+        password: false,
+        placeHolder: 'Your Trello Board Url',
+      });
+      if (url !== undefined) {
+        const parsedURL = new URL(url);
+        const pathname = parsedURL.pathname;
+        const matchRes = pathname.match(/\/b\/(\w+)\//);
+        if (matchRes) {
+          const boardShortLink = matchRes[1];
+          const boards = await this.getBoards();
+          const board = boards.find(
+            (board) => board.shortLink === boardShortLink
+          );
+          if (board) {
+            this.BOARD_ID = board.id;
+            this.globalState.update(GLOBAL_STATE.BOARD_ID, board.id);
+            vscode.window.showInformationMessage('Success');
+          } else {
+            vscode.window.showErrorMessage('Error Trello Board Url is invalid');
+          }
+        } else {
+          vscode.window.showErrorMessage('Error Trello Board Url is invalid');
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      vscode.window.showErrorMessage('Error fetching API token');
     }
   }
 
@@ -143,25 +179,26 @@ export class TrelloActions {
     return res;
   }
 
-  async addCard(): Promise<Number> {
-    const boardId = 'sXCjgnLw';
+  async addCard(): Promise<void> {
+    const boardId = this.BOARD_ID;
+    if (!boardId) {
+      vscode.window.showErrorMessage(
+        'Error Trello Board Url is invalid, Please authenticate'
+      );
+      return;
+    }
     const cardName = await vscode.window.showInputBox({
       ignoreFocusOut: true,
       placeHolder: 'Enter name of card',
     });
     if (cardName === undefined) {
-      return 2;
+      return;
     }
     const basePayload = {
       key: this.API_KEY,
       token: this.API_TOKEN,
       name: cardName,
     };
-    const boards = await this.getBoards();
-    const board = boards.find((board) => board.shortLink === boardId);
-    if (!board) {
-      return 3;
-    }
 
     const checklists = await this.getChecklistsFromBoard(boardId);
     const currentDate = getCurrentDate();
@@ -175,18 +212,18 @@ export class TrelloActions {
         idList: checklist.id,
       });
       if (!createdCard) {
-        return 3;
+        return;
       }
       this.showSuccessMessage(
         `Created Card: ${createdCard.idShort}-${createdCard.name}`,
         createdCard.shortUrl
       );
-      return 0;
+      return;
     } else {
       const createdChecklist = await trelloApiPostRequest('/1/lists', {
         key: this.API_KEY,
         token: this.API_TOKEN,
-        idBoard: board.id,
+        idBoard: boardId,
         name: currentDate,
       });
       if (createdChecklist) {
@@ -195,14 +232,14 @@ export class TrelloActions {
           idList: createdChecklist.id,
         });
         if (!createdCard) {
-          return 3;
+          return;
         }
         this.showSuccessMessage(
           `Created Card: ${createdCard.idShort}-${createdCard.name}`,
           createdCard.shortUrl
         );
       }
-      return 0;
+      return;
     }
   }
 }
