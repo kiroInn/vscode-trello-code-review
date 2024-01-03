@@ -1,8 +1,8 @@
 {
-  "name": "vscode-trello-code-review",
+  "name": "trello-code-review",
   "displayName": "Trello Code Review",
   "description": "Efficiently create code review feedback on trello",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "HaoLi",
   "author": {
     "name": "HaoLi",
