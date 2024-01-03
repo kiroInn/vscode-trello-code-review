@@ -2,7 +2,7 @@
   "name": "trello-code-review",
   "displayName": "Trello Code Review",
   "description": "Efficiently create code review feedback on trello",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "HaoLi",
   "author": {
     "name": "HaoLi",
@@ -21,6 +21,7 @@
   },
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "icon": "image/logo.png",
   "contributes": {
     "commands": [
       {
