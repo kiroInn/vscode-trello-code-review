@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
 
-import { encrypt, decrypt, getCurrentDate } from '../common/utils';
+import { encrypt, decrypt, getCurrentDate, getNextDate } from '../common/utils';
 import { TrelloBoard, TrelloList } from '.';
 import { API_BASE_URL, GLOBAL_STATE } from './constants';
 import { trelloApiGetRequest, trelloApiPostRequest } from './api';
@@ -194,17 +194,19 @@ export class TrelloActions {
     if (cardName === undefined) {
       return;
     }
-    const basePayload = {
-      key: this.API_KEY,
-      token: this.API_TOKEN,
-      name: cardName,
-    };
-
+    const roleAuth = { key: this.API_KEY, token: this.API_TOKEN };
     const checklists = await this.getChecklistsFromBoard(boardId);
     const currentDate = getCurrentDate();
-    const checklist = checklists.find(
-      (checklist) => checklist.name === currentDate
-    );
+    const checklist = checklists.find((cl) => cl.name === currentDate);
+    const { id: userId } = await trelloApiGetRequest(`/1/members/me`, roleAuth);
+
+    const basePayload = {
+      ...roleAuth,
+      name: cardName,
+      idMembers: [userId],
+      due: getNextDate(),
+      desc: this.getCardDesc(),
+    };
 
     if (!!checklist) {
       const createdCard = await trelloApiPostRequest('/1/cards', {
@@ -221,8 +223,7 @@ export class TrelloActions {
       return;
     } else {
       const createdChecklist = await trelloApiPostRequest('/1/lists', {
-        key: this.API_KEY,
-        token: this.API_TOKEN,
+        ...roleAuth,
         idBoard: boardId,
         name: currentDate,
       });
@@ -241,5 +242,21 @@ export class TrelloActions {
       }
       return;
     }
+  }
+
+  getCardDesc() {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      const fileUri = editor.document.uri;
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+      if (workspaceFolder) {
+        const relativePath = vscode.workspace.asRelativePath(fileUri);
+        const lineNumber = editor.selection.active.line + 1;
+        return `${workspaceFolder.name} ${relativePath} ${lineNumber}`;
+      } else {
+        vscode.window.showInformationMessage('No workspace folder found.');
+      }
+    }
+    return ``;
   }
 }

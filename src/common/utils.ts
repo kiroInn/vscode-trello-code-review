@@ -48,3 +48,10 @@ export function getCurrentDate() {
 
   return `${year}-${month}-${day}`;
 }
+
+export function getNextDate() {
+  const currentDate = new Date();
+  const nextDay = new Date(currentDate);
+  nextDay.setDate(currentDate.getDate() + 1);
+  return nextDay.toISOString();
+}
