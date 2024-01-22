@@ -249,13 +249,11 @@ export class TrelloActions {
     if (editor) {
       const fileUri = editor.document.uri;
       const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
-      if (workspaceFolder) {
-        const relativePath = vscode.workspace.asRelativePath(fileUri);
-        const lineNumber = editor.selection.active.line + 1;
-        return `${workspaceFolder.name} ${relativePath} ${lineNumber}`;
-      } else {
-        vscode.window.showInformationMessage('No workspace folder found.');
-      }
+      const relativePath = vscode.workspace.asRelativePath(fileUri);
+      const lineNumber = editor.selection.active.line + 1;
+      return `${
+        workspaceFolder ? workspaceFolder.name : ''
+      } ${relativePath} ${lineNumber}`;
     }
     return ``;
   }
