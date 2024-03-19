@@ -3,7 +3,7 @@
 
 # vscode trello code review
 
-> Efficiently create code review feedback on trello
+> easy create code review feedback on trello
 
 ## Features
 
@@ -19,6 +19,6 @@
 
 ## Ref
 
-vscode: https://code.visualstudio.com/api/references/vscode-api
-trello: https://developer.atlassian.com/cloud/trello/rest
-vsce: https://code.visualstudio.com/api
+- vscode: https://code.visualstudio.com/api/references/vscode-api
+- trello: https://developer.atlassian.com/cloud/trello/rest
+- vsce: https://code.visualstudio.com/api
